@@ -41,6 +41,10 @@ export const ContactList: React.FC = () => {
         navigate(`/society-contacts/${contactId}`);
     };
 
+    const displayService = () => {
+        return "En service";
+    };
+
     return (
         <AppContent scrollable={false}>
             <AppTitle app={contactsApp} />
@@ -97,6 +101,17 @@ export const ContactList: React.FC = () => {
                                                         })}
                                                     >
                                                         {contact.display}
+                                                    </p>
+                                                </div>
+                                                <div className="flex-1 min-w-0 cursor-pointer">
+                                                    <span className="absolute inset-0" aria-hidden="true" />
+                                                    <p
+                                                        className={cn('text-left text-sm font-medium', {
+                                                            'text-gray-100': config.theme.value === 'dark',
+                                                            'text-gray-600': config.theme.value === 'light',
+                                                        })}
+                                                    >
+                                                        {() => displayService()}
                                                     </p>
                                                 </div>
                                             </div>
