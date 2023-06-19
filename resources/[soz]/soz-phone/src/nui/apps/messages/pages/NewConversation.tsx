@@ -4,14 +4,20 @@ import { AppTitle } from '@ui/components/AppTitle';
 import { Button } from '@ui/old_components/Button';
 import cn from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { useContact } from '../../../hooks/useContact';
 import { useConfig } from '../../../hooks/usePhone';
 import { ContactPicture } from '../../../ui/components/ContactPicture';
+import { InputBase } from '../../../ui/old_components/Input';
 import { SearchField } from '../../../ui/old_components/SearchField';
 import { useMessageAPI } from '../hooks/useMessageAPI';
+
+interface IFormInputs {
+    number: string;
+}
 
 export const NewConversation = () => {
     const [t] = useTranslation();
@@ -19,6 +25,7 @@ export const NewConversation = () => {
     const navigate = useNavigate();
     const config = useConfig();
 
+    const { register, watch } = useForm<IFormInputs>();
     const { getFilteredContacts } = useContact();
     const [searchValue, setSearchValue] = useState<string>('');
     const filteredContacts = useMemo(() => {
@@ -37,14 +44,42 @@ export const NewConversation = () => {
         navigate(-1);
     };
 
+    const handleNewContact = () => {
+        const number = watch('number').toString();
+        if (number.length === 8) {
+            addConversation(watch('number').toString());
+        }
+    };
+
     return (
         <>
-            <AppTitle title="Contacts">
+            <AppTitle title="Nouveau Message">
                 <Button className="flex items-center text-base" onClick={handleCancel}>
                     <ChevronLeftIcon className="h-5 w-5" /> Fermer
                 </Button>
             </AppTitle>
             <AppContent>
+                <div className="h-12 mb-12">
+                    <div className="pt-5 h-full flex justify-center">
+                        <InputBase
+                            maxLength={8}
+                            className={cn('bg-transparent w-2/4 text-center text-2xl flex items-center', {
+                                'text-white': config.theme.value === 'dark',
+                                'text-black': config.theme.value === 'light',
+                            })}
+                            {...register('number', { pattern: /^555-[\d-]{4}$/i })}
+                            defaultValue={'555-' || ''}
+                        />
+                    </div>
+                    {watch('number')?.length === 8 && (
+                        <p
+                            className="text-center font-bold text-[#347DD9] cursor-pointer pt-2"
+                            onClick={handleNewContact}
+                        >
+                            Envoyer un message
+                        </p>
+                    )}
+                </div>
                 <SearchField
                     placeholder={t('CONTACTS.PLACEHOLDER_SEARCH_CONTACTS')}
                     onChange={e => setSearchValue(e.target.value)}
